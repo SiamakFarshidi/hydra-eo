@@ -1,0 +1,65 @@
+
+---
+title: "HYDRA-EO Synthetic Demo: NDVI + SIF Simulation"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(toolsrtm)
+library(scopeinr)
+library(ggplot2)
+```
+
+# Demo: Simulate NDVI and SIF using ToolsRTM + SCOPEinR
+
+## 1. Define Trait Scenario
+```{r}
+traits <- list(
+  Cab = 40,     # chlorophyll content [µg/cm2]
+  LAI = 3,      # leaf area index
+  Cw  = 0.015,  # leaf water content [cm]
+  Cm  = 0.009,  # dry matter content [g/cm2]
+  Vcmax = 60    # photosynthetic capacity
+)
+```
+
+## 2. Run PROSAIL (ToolsRTM)
+```{r}
+prosail_out <- prosail_simulation(Cab = traits$Cab, LAI = traits$LAI,
+                                  Cw = traits$Cw, Cm = traits$Cm)
+reflectance <- prosail_out$reflectance
+wl <- prosail_out$wl
+plot(wl, reflectance, type='l', col='forestgreen',
+     xlab="Wavelength (nm)", ylab="Reflectance",
+     main="Simulated Reflectance (PROSAIL)")
+```
+
+## 3. Run SCOPEinR for Functional Outputs
+```{r}
+scope_out <- scope_simulation(Cab = traits$Cab, LAI = traits$LAI,
+                              Vcmax = traits$Vcmax)
+cat("Simulated GPP (µmol CO2 m-2 s-1):", scope_out$GPP, "\n")
+cat("Simulated SIF 760 nm (mW m-2 sr-1 nm-1):", scope_out$SIF760, "\n")
+```
+
+## 4. Compute NDVI
+```{r}
+red <- reflectance[wl == 670]
+nir <- reflectance[wl == 800]
+ndvi <- (nir - red) / (nir + red)
+cat("NDVI:", ndvi, "\n")
+```
+
+## 5. Visualize Combined Outputs
+```{r}
+df <- data.frame(
+  Metric = c("NDVI","SIF760","GPP"),
+  Value  = c(ndvi, scope_out$SIF760, scope_out$GPP)
+)
+
+ggplot(df, aes(x=Metric, y=Value, fill=Metric)) +
+  geom_bar(stat="identity") +
+  theme_minimal() +
+  labs(title="Synthetic Indicators (NDVI, SIF, GPP)")
+```

@@ -1,0 +1,33 @@
+
+stages:
+  - lint
+  - docs
+
+lint:python:
+  image: python:3.11-slim
+  stage: lint
+  script:
+    - python --version
+    - python -m py_compile $(git ls-files '*.py') || true
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push"
+
+lint:R:
+  image: rocker/r-ver:4.3.2
+  stage: lint
+  script:
+    - R --version
+    - R -q -e "sessionInfo()"
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push"
+
+build:docs:
+  image: alpine:3.19
+  stage: docs
+  script:
+    - echo "Docs placeholder build"
+  artifacts:
+    paths:
+      - docs/
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push"
