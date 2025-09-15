@@ -18,6 +18,7 @@ This repository hosts the open materials of the ESA HYDRA‑EO concept: code, da
 HYDRA‑EO/
 ├─ assets/                # images, figures (place logo.png here)
 ├─ info/                  # call text, proposal PDFs, partner info
+├─ apps/                  # Shiny apps
 ├─ scripts/               # reusable code (R / Python)
 │  ├─ R/
 │  └─ python/
