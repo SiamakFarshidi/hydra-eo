@@ -31,7 +31,7 @@ lapply(required_packages, library, character.only = TRUE)
 
 ui <- navbarPage("Online reflectance simulator",theme = shinytheme("flatly"),
 
-          tabPanel(title = "Remote Sensing Course (GRS-20306)",
+          tabPanel(title = "HYDRA-EO",
   # Sidebar layout with input and output definitions ----
   sidebarLayout(
 
